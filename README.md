@@ -1,5 +1,5 @@
 # ddns-updater
- automatically update spdyn ip address
+ automatically update [spdyn](https://spdyn.de/) ip address
 
 ### How to setup and install 
 1) download this repo
