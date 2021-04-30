@@ -12,6 +12,6 @@ ipMonitor.on('change', (prevIp, newIp) => {
         .then((response)=> {
             if (response.ok) console.log('DDNS IP successfully updated');
         })
-        .catch((error)=>console.loerror))
+        .catch((error)=>console.log(error))
     }
 });
