@@ -1,17 +1,15 @@
-const IpMonitor = require('ip-monitor'), axios = require('axios');
+let axios = require('axios'),lastIP , hostname = "", token = "";
 
-const hostname = "", token = "";
-
-const ipMonitor = new IpMonitor({pollingInterval: 36000,verbose: true,externalIp: {timeout: 1000,getIP: 'parallel',services: ['http://icanhazip.com/'],replace: true,verbose: true}});
-ipMonitor.on('error', (error) => console.error(error));
-
-ipMonitor.start();
-ipMonitor.on('change', (prevIp, newIp) => {
-    if(prevIp && newIp && prevIp!=newIp){
-        axios.get(`https://update.spdyn.de/nic/update?hostname=${hostname}&myip=${newIp}&user=hostname&pass=token`)
-        .then((response)=> {
-            if (response.ok) console.log('DDNS IP successfully updated');
-        })
-        .catch((error)=>console.log(error))
-    }
-});
+async function checkIP() { 
+    let ipRequest = await axios.get('https://api.my-ip.io/ip.json');
+    if (ipRequest.status === 200){
+        console.log("got valid IP")
+        if (lastIP !== ipRequest.data.ip){
+            console.log(`new IP: ${ipRequest.data.ip}`)
+            let updateResponce = await axios.get(`https://www.duckdns.org/update?domains=${hostname}&token=${token}&verbose=true`)
+            console.log(updateResponce.data)       
+        }
+    }else console.error("there was an error getting new IP")
+}
+checkIP()
+setInterval(checkIP, 7200000);
