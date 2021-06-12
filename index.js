@@ -1,15 +1,18 @@
-let axios = require('axios'),lastIP , hostname = "", token = "";
+const fetch = require('node-fetch'), hostname = "", token = "";
+let lastIP;
 
 async function checkIP() { 
-    let ipRequest = await axios.get('https://api.my-ip.io/ip.json');
-    if (!ipRequest.status === 200) return console.error("there was an error getting new IP")
+    const ipRequest = await fetch('https://api.my-ip.io/ip.json');
 
-    console.log("got valid IP")
-    if (lastIP === ipRequest.data.ip) return
-    
-    console.log(`new IP: ${ipRequest.data.ip}`)
-    let updateResponce = await axios.get(`https://www.duckdns.org/update?domains=${hostname}&token=${token}&verbose=true`).catch((error) => console.log('Error', error.message));
-    console.log(updateResponce.data)       
+    if (!ipRequest.ok) return console.error("there was an error getting new IP")
+    const ipRequestJSON = await ipRequest.json()
+
+    if (lastIP === ipRequestJSON.ip) return
+    console.log(`new IP: ${ipRequestJSON.ip}`)
+
+    const updateResponce = await fetch(`https://www.duckdns.org/update?domains=${hostname}&token=${token}&verbose=true`)
+    .catch(err => console.log);
+
+    console.log(`Updated duckdns to ${ipRequestJSON.ip} with responce: ${ipRequest.status}`)       
 }
-checkIP()
 setInterval(checkIP, 7200000);
